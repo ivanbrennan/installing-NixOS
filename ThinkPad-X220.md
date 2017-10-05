@@ -262,6 +262,7 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
     uid = 1000;
     createHome = true;
     home = "/home/ivan";
+    extraGroups = [ "wheel" "networkmanager" ];
   };
 
   # This value determines the NixOS release with which your system is to be

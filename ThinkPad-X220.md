@@ -1,7 +1,7 @@
 ## Download installation CD image
 
 - [NixOS downloads page](https://nixos.org/nixos/download.html)
- - [Graphical live CD, 64-bit Intel/AMD](https://d3g5gsiof5omrk.cloudfront.net/nixos/17.09/nixos-17.09.1502.19879836d1/nixos-graphical-17.09.1502.19879836d1-x86_64-linux.iso)
+ - [Minimal installation CD, 64-bit Intel/AMD](https://d3g5gsiof5omrk.cloudfront.net/nixos/17.09/nixos-17.09.1502.19879836d1/nixos-minimal-17.09.1502.19879836d1-x86_64-linux.iso)
 
 ## Format USB drive
 
@@ -20,7 +20,7 @@
 diskutil list
 diskutil unmountDisk /dev/disk2
 sudo dd bs=4m \
-        if=/Users/ivan/Downloads/nixos-graphical-17.03.1858.3d04a557b7-x86_64-linux.iso \
+        if=/Users/ivan/Downloads/nixos-minimal-17.09.1502.19879836d1-x86_64-linux.iso \
         of=/dev/disk2
 ```
 When macOS prompts about unreadable disk, select "Eject".
@@ -36,12 +36,6 @@ When macOS prompts about unreadable disk, select "Eject".
 - select default NixOS installer
 
 ## Setup hard drive
-
-### Turn off wifi
-
-```
-systemctl stop wpa_supplicant.service
-```
 
 ### Partitions
 
@@ -221,8 +215,14 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   # environment.systemPackages = with pkgs; [
-  #   wget
+  #   wget vim
   # ];
+
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.bash.enableCompletion = true;
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
 
   # List services that you want to enable:
 
@@ -243,6 +243,9 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
   services.xserver.layout = "us";
   # services.xserver.xkbOptions = "eurosign:e";
 
+  # Enable touchpad support.
+  # services.xserver.libinput.enable = true;
+
   # Enable the KDE Desktop Environment.
   # services.xserver.displayManager.sddm.enable = true;
   # services.xserver.desktopManager.plasma5.enable = true;
@@ -261,8 +264,11 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
     home = "/home/ivan";
   };
 
-  # The NixOS release to be compatible with for stateful data such as databases.
-  system.stateVersion = "17.03";
+  # This value determines the NixOS release with which your system is to be
+  # compatible, in order to avoid breaking some software such as database
+  # servers. You should change this only after NixOS release notes say you
+  # should.
+  system.stateVersion = "17.09"; # Did you read the comment?
 
 }
 ```

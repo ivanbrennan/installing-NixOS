@@ -431,3 +431,9 @@ Rebuild
 ```
 sudo nixos-rebuild switch
 ```
+
+## Adjust desktop
+
+Alt-F2 `restart` to restart Gnome
+Turn on "Tap to Click" in Mouse & Touchpad settings
+12 hour clock

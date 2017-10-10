@@ -43,39 +43,67 @@ When macOS prompts about unreadable disk, select "Eject".
 
 ### Partitions
 
-Inspect devices and start `fdisk` on the internal drive.
+We will only encrypt the Linux LVM partition as the boot process will need to be able to read the EFI System Partition before prompting us for the encryption key.
 
+Double-check the device to partition:
 ```
 fdisk -l
-fdisk /dev/nvme0n1
 ...
 ```
 
-Start gdisk
+Start `gdisk`
 ```
 gdisk nvme0n1
+p
+```
+
+Our goal looks like this:
+```
+Number  Size    Code  Name
+1       500 MB  EF00  EFI System Partition
+2       rest    8E00  Linux LVM
 ```
 
 Delete existing partitions
 ```
-d
-...
+o
+p
 ```
 
-Create partitions that look like this:
+Add EFI System partition
+```
+n
+1
+<Enter>
++500M
+ef00
+```
 
+Add Linux LVM partition
 ```
-Number  Size        Code  Name
-  1     1000.0 KiB  EF02  BIOS boot partition
-  2     500.0 MiB   EF00  EFI System Partition
-  3     <the rest>  8E00  Linux LVM
+n
+2
+<Enter>
+<Enter>
+8e00
 ```
+
+Double-check and write
+```
+p
+w
+```
+
+### Write down the partitions
+
+Run `fdisk -l`, identify the EFI System partition and the Linux LVM partition, and jot them down.
+Should be /dev/nvme0n1p1 and /dev/nvme0n1p2
 
 ### Encryption
 
 ```
-cryptsetup luksFormat /dev/nvme0n1p3
-cryptsetup luksOpen /dev/nvme0n1p3 crypted
+cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup luksOpen /dev/nvme0n1p2 crypted
 ```
 
 ### Logical volumes
@@ -90,9 +118,8 @@ lvcreate --name root --extents '100%FREE' cryptedpool
 ### Format
 
 ```
-mkfs.vfat -n BOOT /dev/nvme0n1p2
-# mkfs.ext4 -L root /dev/cryptedpool/root
-mkfs.ext4 -O dir_index -j -L root /dev/cryptedpool/root
+mkfs.vfat -n BOOT /dev/nvme0n1p1
+mkfs.ext4 -L root /dev/cryptedpool/root
 mkswap -L swap /dev/cryptedpool/swap
 ```
 
@@ -101,6 +128,7 @@ mkswap -L swap /dev/cryptedpool/swap
 ```
 mount /dev/cryptedpool/root /mnt
 mkdir /mnt/boot
+# mount /dev/nvme0n1p1 /mnt/boot
 mount /dev/disk/by-label/BOOT /mnt/boot
 swapon /dev/cryptedpool/swap
 ```
@@ -111,6 +139,17 @@ swapon /dev/cryptedpool/swap
 
 ```
 nixos-generate-config --root /mnt
+```
+
+### Write down LVM partition UUID
+
+```
+blkid /dev/nvme0n1p2
+```
+
+Maybe try wrangling it into nano so we can cut and paste it
+```
+blkid /dev/nvme0n1p2 >> /mnt/etc/nixos/configuration.nix
 ```
 
 ### Verify hardware-configuration
@@ -128,25 +167,25 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
     [ <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
     ];
 
-  boot.initrd.availableKernelModules = [ "ehci_pci" "ahci" "usb_storage" "sd_mod" "sdhci_pci" ];
+  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/0aec166a-c7a9-4c4d-b628-97989740a910";
+    { device = "/dev/disk/by-uuid/787b4804-5964-4a84-9ef6-44af32504d72";
       fsType = "ext4";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/185129d6-5ae5-41e5-b5ea-f00666f83502";
-      fsType = "ext2";
+    { device = "/dev/disk/by-uuid/2155-F9DA";
+      fsType = "vfat";
     };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/bba4bfb8-67c1-4895-a9ea-067667bc8c4b"; }
+    [ { device = "/dev/disk/by-uuid/c4827d41-e9be-4579-a419-67c136bb6844"; }
     ];
 
-  nix.maxJobs = lib.mkDefault 4;
+  nix.maxJobs = lib.mkDefault 8;
   powerManagement.cpuFreqGovernor = "powersave";
 }
 ```
@@ -155,6 +194,18 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
 
 `nano /mnt/etc/nixos/configuration.nix`
 
+Add this
+```
+boot.initrd.luks.devices = [
+  {
+    name = "root";
+    device = /dev/disk/by-uuid/<the aforementioned UUID here>;
+    preLVM = true;
+  }
+];
+```
+
+Should look like this:
 ```
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
@@ -168,24 +219,20 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
       ./hardware-configuration.nix
     ];
 
+
   boot.initrd.luks.devices = [
     {
       name = "root";
-      device = "/dev/nvme0n1p3";
+      device = /dev/disk/by-uuid/<LVM-UUID>;
       preLVM = true;
     }
   ];
 
-  # Use the GRUB 2 boot loader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.version = 2;
-  # boot.loader.grub.efiSupport = true;
-  # boot.loader.grub.efiInstallAsRemovable = true;
-  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
-  # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixosX220"; # Define your hostname.
+  networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Select internationalisation properties.
@@ -225,8 +272,8 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
   # services.printing.enable = true;
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-  services.xserver.layout = "us";
+  # services.xserver.enable = true;
+  # services.xserver.layout = "us";
   # services.xserver.xkbOptions = "eurosign:e";
 
   # Enable touchpad support.
@@ -236,20 +283,11 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
   # services.xserver.displayManager.sddm.enable = true;
   # services.xserver.desktopManager.plasma5.enable = true;
 
-  # Gnome desktop
-  services.xserver.desktopManager = {
-    gnome3.enable = true;
-    default = "gnome3";
-  };
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.extraUsers.ivan = {
-    isNormalUser = true;
-    uid = 1000;
-    createHome = true;
-    home = "/home/ivan";
-    extraGroups = [ "wheel" "networkmanager" ];
-  };
+  # users.extraUsers.guest = {
+  #   isNormalUser = true;
+  #   uid = 1000;
+  # };
 
   # This value determines the NixOS release with which your system is to be
   # compatible, in order to avoid breaking some software such as database
@@ -273,6 +311,10 @@ reboot
 ```
 
 Select default configuration at the initial screen, and log in as root.
+
+## Start configuring, setting up desktop, user accounts, etc...
+
+First, did we get this far? Can we reliably (re)boot and log in as root?
 
 ## Set password
 

@@ -155,7 +155,9 @@ blkid /dev/nvme0n1p2
 
 Maybe try wrangling it into nano so we can cut and paste it
 ```
-blkid /dev/nvme0n1p2 >> /mnt/etc/nixos/configuration.nix
+blkid /dev/nvme0n1p2 \
+  | grep -oP '(?<= UUID=")[^"]+(?=")' \
+  >> /mnt/etc/nixos/configuration.nix
 ```
 
 ### Verify hardware-configuration
@@ -210,6 +212,10 @@ boot.initrd.luks.devices = [
   }
 ];
 ```
+and set the timezone
+```
+time.timeZone = "America/New_York";
+```
 
 Should look like this:
 ```
@@ -226,6 +232,10 @@ Should look like this:
     ];
 
 
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   boot.initrd.luks.devices = [
     {
       name = "root";
@@ -234,11 +244,7 @@ Should look like this:
     }
   ];
 
-  # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = "nixos"; # Define your hostname.
+  # networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Select internationalisation properties.

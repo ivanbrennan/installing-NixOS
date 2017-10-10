@@ -437,3 +437,19 @@ sudo nixos-rebuild switch
 Alt-F2 `restart` to restart Gnome
 Turn on "Tap to Click" in Mouse & Touchpad settings
 12 hour clock
+
+## Git
+
+Add `git` to `environment.systemPackages`.
+Put `/etc/nixos/` under version control
+```
+cd /etc/nixos
+su root
+git init
+echo '/hardware-configuration.nix' > .gitignore
+git add configuration.nix .gitignore
+git config user.email "ivan.brennan@gmail.com"
+git config user.name "ivanbrennan"
+git commit -m 'initial commit'
+exit
+```

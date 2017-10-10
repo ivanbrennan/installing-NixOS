@@ -441,6 +441,7 @@ Turn on "Tap to Click" in Mouse & Touchpad settings
 ## Git
 
 Add `git` to `environment.systemPackages`.
+Rebuild NixOS.
 Put `/etc/nixos/` under version control
 ```
 cd /etc/nixos
@@ -453,3 +454,48 @@ git config user.name "ivanbrennan"
 git commit -m 'initial commit'
 exit
 ```
+
+## Chromium
+
+Add `Chromium` and `xclip` to `environment.systemPackages`.
+Rebuild NixOS.
+Restart Gnome.
+Set up ssh keys
+Set up remote for nixos repo
+
+## Set up keyboard
+
+Add `xcape` to `environment.systemPackages`, and add
+```
+services.xserver.xkbOptions = "caps:ctrl_modifier,shift:both_capslock"
+```
+
+## Dotfiles, Vim, Emacs
+
+Create `~/Development/resources/`
+Clone dotfiles, source bashrc, and make symlinks.
+Clone dotvim and symlink `~/.vim`.
+Start vim and run `:PlugInstall`
+Add the following to `systemPackages`
+```
+aspell
+aspellDicts.en
+emacs
+global
+par
+tmux
+universal-ctags
+```
+and also in `configuration.nix`
+```
+fonts.fonts = [
+  pkgs.source-code-pro
+  pkgs.emacs-all-the-icons-fonts
+];
+...
+services.emacs.enable = true;
+```
+Clone emacs.d, checkout `nixos` branch, and symlink `~/.emacs.d`
+Restart Gnome.
+Run `CC` bash hack.
+Start emacs

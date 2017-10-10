@@ -402,3 +402,32 @@ Reboot
 ```
 reboot
 ```
+
+## Setup more system configuration
+```
+sudo vim /etc/nixos/configuration.nix
+```
+```
+networking.hostName = "nixosthinkpad";
+```
+```
+i18n = {
+  consoleKeyMap = "us";
+  defaultLocale = "en_US.UTF-8";
+};
+```
+```
+nix.gc.automatic = true;
+nix.gc.dates = "03:15";
+```
+```
+programs.bash.enableCompletion = true;
+```
+```
+system.autoUpgrade.enable = true;
+```
+
+Rebuild
+```
+sudo nixos-rebuild switch
+```

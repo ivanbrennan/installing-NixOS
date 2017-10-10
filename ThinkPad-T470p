@@ -25,6 +25,15 @@ sudo dd bs=4m \
 ```
 When macOS prompts about unreadable disk, select "Eject".
 
+## Configure ThinkPad startup
+- power on ThinkPad
+- hit Enter at Lenovo screen
+- F1 to configure BIOS
+ - `Security` > `Secure Boot` > `Secure Boot` : `Disabled`
+ - `Startup` > `UEFI/Legacy Boot` : `Both`
+     - `UEFI/Legacy Boot Priority` : `UEFI First`
+ - Security Chip?
+
 ## Boot ThinkPad from USB
 
 - power off ThinkPad
@@ -32,10 +41,7 @@ When macOS prompts about unreadable disk, select "Eject".
 - insert USB
 - press power
 - hit Enter at Lenovo screen
-- F1 to enter BIOS config
-- disable secure boot
-- choose UEFI boot
-- at boot menu, press F12
+- F12
 - select USB drive
 - select default NixOS installer
 

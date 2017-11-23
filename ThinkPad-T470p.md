@@ -207,7 +207,7 @@ Add this
 boot.initrd.luks.devices = [
   {
     name = "root";
-    device = /dev/disk/by-uuid/<the aforementioned UUID here>;
+    device = "/dev/disk/by-uuid/<the aforementioned UUID here>";
     preLVM = true;
   }
 ];

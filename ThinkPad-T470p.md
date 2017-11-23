@@ -59,7 +59,7 @@ fdisk -l
 
 Start `gdisk`
 ```
-gdisk nvme0n1
+gdisk /dev/nvme0n1
 p
 ```
 

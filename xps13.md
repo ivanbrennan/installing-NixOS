@@ -24,3 +24,14 @@ sudo dd bs=4m \
         of=/dev/disk2
 ```
 When macOS prompts about unreadable disk, select "Eject".
+
+## BIOS
+- power on Dell XPS 13
+- tap F2 repeatedly at Dell logo to enter BIOS
+- disable Secure Boot
+  - Settings > Secure Boot > Secure Boot Enable : Disabled
+- adjust Boot Sequence
+  - Settings > General > Boot Sequence : move Windows Boot Manager to bottom of list
+- disable Intel hardware RAID and use AHCI instead
+  - Settings > System Configuration > SATA Operation : AHCI
+- apply (restarts and boots from usb)

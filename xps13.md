@@ -25,6 +25,9 @@ sudo dd bs=4m \
 ```
 When macOS prompts about unreadable disk, select "Eject".
 
+## XPS repair manual
+http://topics-cdn.dell.com/pdf/xps-13-9360-laptop_setup%20guide_en-us.pdf
+
 ## BIOS
 - power on Dell XPS 13
 - tap F2 repeatedly at Dell logo to enter BIOS

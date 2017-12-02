@@ -346,3 +346,17 @@ Should look like this:
 
 }
 ```
+
+## Install
+
+```
+nixos-install
+```
+
+## Reboot
+
+```
+reboot
+```
+
+Select default configuration at the initial screen, and log in as root.

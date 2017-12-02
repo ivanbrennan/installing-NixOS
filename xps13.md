@@ -35,3 +35,9 @@ When macOS prompts about unreadable disk, select "Eject".
 - disable Intel hardware RAID and use AHCI instead
   - Settings > System Configuration > SATA Operation : AHCI
 - apply (restarts and boots from usb)
+
+## Boot from USB
+- select default NixOS installer
+- logs into root
+
+Note: If you make a mistake during the subsequent steps and need to restart the installer, you can run `shutdown now` to cleanly shut the machine off. Don't use `reboot`, as that seems to get stuck.

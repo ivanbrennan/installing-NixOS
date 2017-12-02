@@ -89,3 +89,57 @@ Number  Start (sector)    End (sector)  Size      Code  Name
    5       474597376       497907711   11.1 GiB   2700
    6       497909760       500117503   1.1 GiB    2700
 ```
+
+## Partitions: after
+Our goal looks like this:
+```
+Number  Size    Code  Name
+1       500 MB  EF00  EFI System Partition
+2       rest    8E00  Linux LVM
+```
+
+Delete existing partitions
+```
+o
+p
+```
+
+Add EFI System partition
+```
+n
+1
+<Enter>
++500M
+ef00
+```
+
+Add Linux LVM partition
+```
+n
+2
+<Enter>
+<Enter>
+8e00
+```
+
+Double-check
+```
+p
+
+Disk /dev/nvme0n1: 500118192 sectors, 238.5 GiB
+Logical sector size: 512 bytes
+Disk identifier (GUID): 33DEB725-2DF3-4673-A182-B5FCB48D92FA
+Partition table holds up to 128 entries
+First usable sector is 34, last usable sector is 500118158
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number  Start (sector)    End (sector)  Size      Code  Name
+   1            2048         1026047   500.0 MiB  EF00  EFI System
+   2         1026048       500117503   238.0 GiB  8E00  Linux LVM
+```
+Write changes
+```
+w
+y
+```

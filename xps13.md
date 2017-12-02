@@ -447,3 +447,21 @@ reboot
 ```
 
 Log into Gnome as ivan. Connect to wifi.
+
+## Git
+
+Add `git` to `environment.systemPackages`.
+Rebuild NixOS.
+Put `/etc/nixos/` under version control
+```
+sudo -i
+cd /etc/nixos
+git init
+echo '/hardware-configuration.nix' > .gitignore
+git add configuration.nix .gitignore
+git config user.email "ivan.brennan@gmail.com"
+git config user.name "ivanbrennan"
+git config core.editor "vim"
+git commit -m 'initial commit'
+exit
+```

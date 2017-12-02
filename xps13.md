@@ -360,3 +360,90 @@ reboot
 ```
 
 Select default configuration at the initial screen, and log in as root.
+
+## Start configuring, setting up desktop, user accounts, etc...
+
+First, did we get this far? Can we reliably (re)boot and log in as root?
+
+Add vim so we can edit configuration.nix more easily, and mkpasswd so we can create a non-root user with a hashed password.
+```
+nano /etc/nixos/configuration.nix
+```
+```
+environment.systemPackages = with pkgs; [
+  mkpasswd
+  vimHugeX
+];
+```
+
+Rebuild NixOS
+```
+nixos-rebuild switch
+```
+
+Generate a hashed password for ivan
+```
+mkpasswd -m sha-512 > ivanpasswd
+```
+
+Edit the users configuration
+```
+vim /etc/nixos/configuration.nix ivanpasswd
+```
+```
+users.extraUsers.ivan = {
+  isNormalUser = true;
+  uid = 1000;
+  createHome = true;
+  home = "/home/ivan";
+  extraGroups = [
+    "wheel"
+    "networkmanager"
+  ];
+  hashedPassword = <contents of ivanpasswd>;
+};
+users.mutableUsers = false;
+```
+
+Remove the hashed password file
+```
+rm ivanpasswd
+```
+
+Rebuild NixOS
+```
+nixos-rebuild switch
+```
+
+Exit root account and login as ivan.
+
+## Set up desktop manager
+
+```
+sudo vim /etc/nixos/configuration.nix
+```
+```
+# Enable the X11 windowing system.
+services.xserver.enable = true;
+services.xserver.layout = "us";
+...
+
+# Enable touchpad support.
+services.xserver.libinput.enable = true;
+
+# Gnome desktop
+services.xserver.desktopManager = {
+  gnome3.enable = true;
+  default = "gnome3";
+};
+```
+Rebuild NixOS
+```
+sudo nixos-rebuild switch
+```
+Reboot
+```
+reboot
+```
+
+Log into Gnome as ivan. Connect to wifi.

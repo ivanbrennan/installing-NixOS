@@ -143,3 +143,42 @@ Write changes
 w
 y
 ```
+
+### Take note of which partition is which
+
+Run `fdisk -l`
+EFI System partition is `/dev/nvme0n1p1`
+Linux LVM partition is `/dev/nvme0n1p2`
+
+### Encryption
+
+```
+cryptsetup luksFormat /dev/nvme0n1p2
+cryptsetup luksOpen /dev/nvme0n1p2 crypted
+```
+
+### Logical volumes
+
+```
+pvcreate /dev/mapper/crypted
+vgcreate cryptedpool /dev/mapper/crypted
+lvcreate --name swap --size 4GB cryptedpool
+lvcreate --name root --extents '100%FREE' cryptedpool
+```
+
+### Format
+
+```
+mkfs.vfat -n BOOT /dev/nvme0n1p1
+mkfs.ext4 -L root /dev/cryptedpool/root
+mkswap -L swap /dev/cryptedpool/swap
+```
+
+### Mount
+
+```
+mount /dev/cryptedpool/root /mnt
+mkdir /mnt/boot
+mount /dev/disk/by-label/BOOT /mnt/boot
+swapon /dev/cryptedpool/swap
+```

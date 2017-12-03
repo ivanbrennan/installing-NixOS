@@ -151,8 +151,10 @@ y
 ### Take note of which partition is which
 
 Run `fdisk -l`
-EFI System partition is `/dev/nvme0n1p1`
-Linux LVM partition is `/dev/nvme0n1p2`
+
+`/dev/nvme0n1p1` EFI System partition
+
+`/dev/nvme0n1p2` Linux LVM partition
 
 ### Encryption
 

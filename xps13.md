@@ -34,10 +34,10 @@ http://topics-cdn.dell.com/pdf/xps-13-9360-laptop_setup%20guide_en-us.pdf
 - disable Secure Boot
   - Settings > Secure Boot > Secure Boot Enable : Disabled
 - adjust Boot Sequence
-  - Settings > General > Boot Sequence : move Windows Boot Manager to bottom of list
+  - Settings > General > Boot Sequence : move USB to top of list
 - disable Intel hardware RAID and use AHCI instead
   - Settings > System Configuration > SATA Operation : AHCI
-- apply (restarts and boots from usb)
+- Apply -> Ok -> Exit (causes reboot from USB)
 
 ## Boot from USB
 - select default NixOS installer
@@ -64,7 +64,7 @@ Device             Start       End   Sectors   Size Type
 /dev/nvme0n1p6 497909760 500117503   2207744   1.1G Windows recovery environment
 ```
 
-As reported by 'gdisk /dev/nvme0n1`
+As reported by `gdisk /dev/nvme0n1`
 ```
 The protective MBR's 0xEE partition is oversized! Auto-repairing
 
@@ -76,6 +76,7 @@ Partition table scan:
 
 Found valid GPT with protective MBR; using GPT.
 
+Command (? for help): p
 Disk /dev/nvme0n1: 500118192 sectors, 238.5 GiB
 Logical sector size: 512 bytes
 Disk identifier (GUID): DACEF394-88D5-415B-8C97-1CDBB7516C0A

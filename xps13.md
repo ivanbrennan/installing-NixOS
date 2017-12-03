@@ -359,11 +359,15 @@ Should look like this:
 nixos-install
 ```
 
-## Reboot
+## Shut down
 
 ```
-reboot
+shutdown now
 ```
+
+Remove USB after shutdown.
+
+Power on.
 
 Select default configuration at the initial screen, and log in as root.
 

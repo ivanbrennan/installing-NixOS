@@ -234,34 +234,30 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
 }
 ```
 
-### Append LVM partition UUID to configuration.nix
+### Edit configuration.nix
 
+Write the root partition's UUID to a temp file for reference.
 ```
 blkid /dev/nvme0n1p2 \
   | grep -oP '(?<= UUID=")[^"]+(?=")' \
-  >> /mnt/etc/nixos/configuration.nix
+  > root-UUID
 ```
 
-### Edit configuration.nix
+`vim root-UUID /mnt/etc/nixos/configuration.nix`
 
-`nano /mnt/etc/nixos/configuration.nix`
-
-Add this
+Add `boot.initrd.luks.devices` to configuration.
 ```
 boot.initrd.luks.devices = [
   {
     name = "root";
-    device = "/dev/disk/by-uuid/<the aforementioned UUID here>";
+    device = "/dev/disk/by-uuid/<UUID here>";
     preLVM = true;
   }
 ];
 ```
-and set the timezone
-```
-time.timeZone = "America/New_York";
-```
 
-Should look like this:
+### Verify configuration.nix
+
 ```
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
@@ -298,7 +294,7 @@ Should look like this:
   # };
 
   # Set your time zone.
-  time.timeZone = "America/New_York";
+  # time.timeZone = "Europe/Amsterdam";
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
@@ -351,6 +347,11 @@ Should look like this:
   system.stateVersion = "17.09"; # Did you read the comment?
 
 }
+```
+
+Delete the UUID file.
+```
+rm root-UUID
 ```
 
 ## Install
@@ -426,6 +427,12 @@ nixos-rebuild switch
 ```
 
 Exit root account and login as ivan.
+
+## Set timezone
+
+```
+  time.timeZone = "America/New_York";
+```
 
 ## Set up desktop manager
 

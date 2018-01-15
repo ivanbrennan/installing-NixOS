@@ -66,7 +66,7 @@ Device             Start       End   Sectors   Size Type
 
 As reported by `gdisk /dev/nvme0n1`
 ```
-The protective MBR's 0xEE partition is oversized! Auto-repairing
+The protective MBR's 0xEE partition is oversized! Auto-repairing.
 
 Partition table scan:
   MBR: protective

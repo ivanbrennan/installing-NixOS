@@ -29,7 +29,9 @@ When macOS prompts about unreadable disk, select "Eject".
 http://topics-cdn.dell.com/pdf/xps-13-9360-laptop_setup%20guide_en-us.pdf
 
 ## BIOS
-- power on Dell XPS 13
+- turn off Dell XPS 13
+- insert USB
+- turn on Dell XPS 13
 - tap F2 repeatedly at Dell logo to enter BIOS
 - disable Secure Boot
   - Settings > Secure Boot > Secure Boot Enable : Disabled

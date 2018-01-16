@@ -381,7 +381,7 @@ nano /etc/nixos/configuration.nix
 ```
 environment.systemPackages = with pkgs; [
   mkpasswd
-  vimHugeX
+  vim
 ];
 ```
 

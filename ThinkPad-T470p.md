@@ -1,7 +1,7 @@
 ## Download installation CD image
 
 - [NixOS downloads page](https://nixos.org/nixos/download.html)
- - [Minimal installation CD, 64-bit Intel/AMD](https://d3g5gsiof5omrk.cloudfront.net/nixos/17.09/nixos-17.09.1502.19879836d1/nixos-minimal-17.09.1502.19879836d1-x86_64-linux.iso)
+- [Minimal installation CD, 64-bit Intel/AMD](https://d3g5gsiof5omrk.cloudfront.net/nixos/17.09/nixos-17.09.1502.19879836d1/nixos-minimal-17.09.1502.19879836d1-x86_64-linux.iso)
 
 ## Format USB drive
 

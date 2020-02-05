@@ -1,7 +1,7 @@
 ## Download installation CD image
 
 - [NixOS downloads page](https://nixos.org/nixos/download.html)
- - [Minimal installation CD, 64-bit Intel/AMD](https://d3g5gsiof5omrk.cloudfront.net/nixos/17.09/nixos-17.09.1502.19879836d1/nixos-minimal-17.09.1502.19879836d1-x86_64-linux.iso)
+- [Minimal installation CD, 64-bit Intel/AMD](https://releases.nixos.org/nixos/19.09/nixos-19.09.1914.d14cea0dec2/nixos-minimal-19.09.1914.d14cea0dec2-x86_64-linux.iso)
 
 ## Format USB drive
 
@@ -20,7 +20,7 @@
 diskutil list
 diskutil unmountDisk /dev/disk2
 sudo dd bs=4m \
-        if=/Users/ivan/Downloads/nixos-minimal-17.09.1502.19879836d1-x86_64-linux.iso \
+        if=/Users/ivan/Downloads/nixos-minimal-19.09.1914.d14cea0dec2-x86_64-linux.iso \
         of=/dev/disk2
 ```
 When macOS prompts about unreadable disk, select "Eject".

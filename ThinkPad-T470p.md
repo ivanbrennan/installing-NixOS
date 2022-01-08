@@ -45,23 +45,61 @@ When macOS prompts about unreadable disk, select "Eject".
 - select USB drive
 - select default NixOS installer
 
+## Gain root privileges
+
+```
+sudo -i
+```
+
 ## Setup hard drive
 
-### Partitions
+### Partitions: before
 
-We will only encrypt the Linux LVM partition as the boot process will need to be able to read the EFI System Partition before prompting us for the encryption key.
-
-Double-check the device to partition:
 ```
-fdisk -l
-...
+fdisk -l /dev/nvme0n1
+Disk /dev/nvme0n1: 238.5 GiB, 256060514304 bytes, 500118192 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: E80040FA-2892-45D9-A5AF-0CABE89E3F7C
+
+Device             Start       End   Sectors   Size Type
+/dev/nvme0n1p1      2048   1050623   1048676   512M EFI System
+/dev/nvme0n1p2   1050624 500117503 499066880   238G Linux filesystem
 ```
 
-Start `gdisk`
 ```
 gdisk /dev/nvme0n1
-p
+GPT fdisk (gdisk) version 1.0.4
+
+Partition table scan:
+  MBR: protective
+  BSD: not present
+  APM: not present
+  GPT: present
+
+Found valid GPT with protective MBR; using GPT.
+
+Command (? for help): p
+Disk /dev/nvme0n1: 500118192 sectors, 238.5 GiB
+Model: INTEL SSDPEKKF256G7L
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): E80040FA-2892-45D9-A5AF-0CABE89E3F7C
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 500118158
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2669 sectors (1.3 MiB)
+
+Number  Start (sector)    End (sector)  Size      Code  Name
+   1            2048         1050623   512.0 MiB  EF00  EFI System Partition
+   2         1050624       500117503   238.0 GiB  8300
 ```
+
+## Partitions: after
+
+We will only encrypt the Linux LVM partition as the boot process will need to be able to read the EFI System Partition before prompting us for the encryption key.
 
 Our goal looks like this:
 ```
@@ -94,16 +132,37 @@ n
 8e00
 ```
 
-Double-check and write
+Double-check
 ```
 p
+
+Disk /dev/nvme0n1: 500118192 sectors, 238.5 GiB
+Model: INTEL SSDPEKKF256G7L
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): 95C820DD-5534-4830-8FE8-EFC40103204E
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 500118158
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 2014 sectors (1007.0 KiB)
+
+Number  Start (sector)    End (sector)  Size      Code  Name
+   1            2048         1026047   500.0 MiB  EF00  EFI System
+   2         1026048       500118158   238.0 GiB  8E00  Linux LVM
+```
+
+Write changes
+```
 w
 ```
 
-### Write down the partitions
+### Take note of which partition is which
 
-Run `fdisk -l`, identify the EFI System partition and the Linux LVM partition, and jot them down.
-Should be /dev/nvme0n1p1 and /dev/nvme0n1p2
+Run `fdisk -l`
+
+`/dev/nvme0n1p1` EFI System partition
+
+`/dev/nvme0n1p2` Linux LVM partition
 
 ### Encryption
 
@@ -111,6 +170,12 @@ Should be /dev/nvme0n1p1 and /dev/nvme0n1p2
 cryptsetup luksFormat /dev/nvme0n1p2
 cryptsetup luksOpen /dev/nvme0n1p2 crypted
 ```
+
+Note: the first command generated a warning:
+```
+WARNING: Locking directory /run/cryptsetup is missing!
+```
+This is apparently harmless. https://github.com/NixOS/nixpkgs/issues/86248
 
 ### Logical volumes
 
@@ -134,7 +199,6 @@ mkswap -L swap /dev/cryptedpool/swap
 ```
 mount /dev/cryptedpool/root /mnt
 mkdir /mnt/boot
-# mount /dev/nvme0n1p1 /mnt/boot
 mount /dev/disk/by-label/BOOT /mnt/boot
 swapon /dev/cryptedpool/swap
 ```
@@ -153,11 +217,11 @@ nixos-generate-config --root /mnt
 blkid /dev/nvme0n1p2
 ```
 
-Maybe try wrangling it into nano so we can cut and paste it
+Write the root partition's UUID to a temp file for reference.
 ```
 blkid /dev/nvme0n1p2 \
   | grep -oP '(?<= UUID=")[^"]+(?=")' \
-  >> /mnt/etc/nixos/configuration.nix
+  > /root/uuid
 ```
 
 ### Verify hardware-configuration
@@ -176,21 +240,22 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
+  boot.initrd.kernelModules = [ "dm-snapshot" ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/787b4804-5964-4a84-9ef6-44af32504d72";
+    { device = "/dev/disk/by-uuid/a71028af-6b62-45b3-afe6-94a0944fd587";
       fsType = "ext4";
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/2155-F9DA";
+    { device = "/dev/disk/by-uuid/BAFB-6D5D";
       fsType = "vfat";
     };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/c4827d41-e9be-4579-a419-67c136bb6844"; }
+    [ { device = "/dev/disk/by-uuid/28ef024a-5023-43dd-9114-13ab2b0efe34"; }
     ];
 
   nix.maxJobs = lib.mkDefault 8;
@@ -200,21 +265,17 @@ $ cat /mnt/etc/nixos/hardware-configuration.nix
 
 ### Edit configuration.nix
 
-`nano /mnt/etc/nixos/configuration.nix`
+`vim /mnt/etc/nixos/configuration.nix`
 
-Add this
+Add `boot.initrd.luks.devices` to configuration.
 ```
 boot.initrd.luks.devices = [
   {
     name = "root";
-    device = "/dev/disk/by-uuid/<the aforementioned UUID here>";
+    device = "/dev/disk/by-uuid/<UUID here>";
     preLVM = true;
   }
 ];
-```
-and set the timezone
-```
-time.timeZone = "America/New_York";
 ```
 
 Should look like this:
@@ -255,7 +316,7 @@ Should look like this:
   # };
 
   # Set your time zone.
-  time.timeZone = "America/New_York";
+  # time.timeZone = "Europe/Amsterdam";
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
@@ -305,9 +366,14 @@ Should look like this:
   # compatible, in order to avoid breaking some software such as database
   # servers. You should change this only after NixOS release notes say you
   # should.
-  system.stateVersion = "17.09"; # Did you read the comment?
+  system.stateVersion = "19.09"; # Did you read the comment?
 
 }
+```
+
+Delete the UUID file.
+```
+rm /root/uuid
 ```
 
 ## Install
@@ -316,11 +382,15 @@ Should look like this:
 nixos-install
 ```
 
-## Reboot
+## Shut down
 
 ```
-reboot
+shutdown now
 ```
+
+Remove USB after shutdown.
+
+Power on.
 
 Select default configuration at the initial screen, and log in as root.
 
@@ -330,9 +400,12 @@ First, did we get this far? Can we reliably (re)boot and log in as root?
 
 Add vim so we can edit configuration.nix more easily, and mkpasswd so we can create a non-root user with a hashed password.
 ```
+nano /etc/nixos/configuration.nix
+```
+```
 environment.systemPackages = with pkgs; [
   mkpasswd
-  vimHugeX
+  vim
 ];
 ```
 
@@ -348,7 +421,7 @@ mkpasswd -m sha-512 > ivanpasswd
 
 Edit the users configuration
 ```
-vim /etc/nixos/configuration.nix ivanpasswd
+vim /etc/nixos/configuration.nix
 ```
 ```
 users.extraUsers.ivan = {
@@ -373,6 +446,15 @@ nixos-rebuild switch
 ```
 
 Exit root account and login as ivan.
+
+## Set timezone
+
+```
+sudo vim /etc/nixos/configuration.nix
+```
+```
+  time.timeZone = "America/New_York";
+```
 
 ## Set up desktop manager
 
@@ -401,6 +483,18 @@ sudo nixos-rebuild switch
 Reboot
 ```
 reboot
+```
+
+## Git
+
+Add `git` to `environment.systemPackages`.
+Rebuild NixOS.
+
+Backup current config
+```
+sudo -i
+mkdir /root/backup-etc-nixos
+cp /etc/nixos/{configuration,hardware}.nix /root/backup-etc-nixos/
 ```
 
 ## Setup more system configuration

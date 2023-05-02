@@ -1,0 +1,599 @@
+
+--------------------------------------------------------------------------------
+Software name      BIOS Update Utility
+
+Support models     ThinkPad X1 Carbon Gen 5 (Type 20HQ, 20HR, 20K3, 20K4)
+
+Operating Systems  Ubuntu 16.04.4 LTS
+                   Debian 9.3.0
+                   Red Hat Linux Enterprise 7.5
+                   Suse Linux Enterprise 12 SP3
+
+Version            1.57
+
+
+--------------------------------------------------------------------------------
+WHAT THIS PACKAGE DOES
+
+  This package updates the UEFI BIOS (including system program) stored in
+  the ThinkPad computer to fix problems, add new functions, or expand functions
+  as noted below.
+
+  Linux capsule update is supported on the UEFI BIOS version 1.34 or higher.
+
+
+--------------------------------------------------------------------------------
+CHANGES IN THIS RELEASE
+  Version 1.57
+
+[Important updates]
+- Enhancement to address security vulnerability, CVE-2017-5715
+- Enhancement to address security vulnerability, CVE-2022-33894
+- Enhancement to address security vulnerability, CVE-2022-34301, CVE-2022-34302, CVE-2022-34303
+
+[New functions or enhancements]
+ - Updated the Diagnostics module to version 04.27.000.
+
+[Problem fixes]
+ - Nothing
+
+
+--------------------------------------------------------------------------------
+DETERMINING WHICH VERSION IS INSTALLED
+
+
+ [Checking on ThinkPad Setup]
+
+  1. Turn on the computer.
+  2. While the "To interrupt normal startup, press Enter" message is displayed
+     at the lower-left area or lower-center of the screen, press the F1 key.
+     The ThinkPad Setup menu will be displayed. If a password prompt appears,
+     type the correct password.
+  3. Locate the UEFI BIOS Version line.
+     "UEFI BIOS version (BIOS ID)" will be shown on the UEFI BIOS Version line.
+  4. Turn off the computer.
+
+
+--------------------------------------------------------------------------------
+NOTES
+
+- If the UEFI BIOS has been rolled back to version 1.29 from higher version,
+  CPU microcode (MCU) is also rolled back to older version than the one addressed
+  for CVE-2017-5715.
+
+- If the UEFI BIOS has been updated to version 1.23 or higher, it is no longer
+  able to roll back to the version before 1.23 for security improvement.
+
+- If the UEFI BIOS has been updated to version 1.14 or higher, it is no longer
+  able to roll back to the version before 1.14 for security improvement.
+
+- Be aware that ThinkPad Dock have the latest Dock firmware by applying
+  the Dock firmware update tool available at the Lenovo site.
+
+- Be aware that the OS Optimized Defaults option in the Restart menu of ThinkPad
+  Setup should not be normally changed. Lenovo recommends to use the factory
+  default setting for it, as follows.
+
+--------------------------------------------------------------------------------
+UPDATING THE UEFI BIOS
+
+Note for Ubuntu 16.04.4 LTS:
+  See "Manual Update Using fwupdmgr" section for instruction.
+
+IMPORTANT NOTE for Debian 9.3.0:
+  Debian 9.3.0 does not include fwupd package which is required to update
+  firmware by default.
+  Please check with your distribution vendor contact how to install
+  fwupd package. After you installed fwupd package,
+  see "Manual Update Using fwupdmgr" section for instruction.
+
+IMPORTANT NOTE for Red Hat Linux Enterprise 7.5:
+  Red Hat Linux Enterprise 7.5 does not include fwupd package
+  which is required to update firmware by default.
+  Please check with your distribution vendor contact how to install
+  fwupd package. After you installed fwupd package,
+  see "Manual Update Using fwupdmgr" section for instruction.
+
+IMPORTANT NOTE for Suse Linux Enterprise 12 SP3:
+  No fwupd package is available for Suse Linux Enterprise 12 SP3.
+  You need to use "fwupdate" command instead, a lower-layer frontend,
+  which is not included by default.
+  Please check with your distribution vendor contact how to install
+  fwupdate package. See "Manual Update Using fwupdate" section.
+
+
+Notes:
+- If the UEFI BIOS has been rolled back to version 1.29 from higher version,
+  CPU microcode (MCU) is also rolled back to older version than the one addressed
+  for CVE-2017-5715.
+- If the UEFI BIOS has been updated to version 1.23 or higher, it is no longer
+  able to roll back to the version before 1.23 for security improvement.
+- If the UEFI BIOS has been updated to version 1.14 or higher, it is no longer
+  able to roll back to the version before 1.14 for security improvement.
+- If your computer runs satisfactorily now, it may not be necessary to update
+  the UEFI BIOS. To determine if you should update the UEFI BIOS, refer to the
+  Version Information section.
+- You need an AC adapter and a charged battery pack.
+- Remove the Power-on password prior to updating the UEFI BIOS in the remote
+  deployment environments.
+
+Attention:
+  Do not turn off or suspend the computer until the update has been completed.
+  IF YOU DO THAT WHILE THE UPDATE IS STILL IN PROGRESS, THE SYSTEM BOARD MAY
+  HAVE TO BE REPLACED.
+
+
+Manual Update Using fwupdmgr
+
+  1. Make sure the AC adapter is firmly connected to the target computer.
+  2. Launch Terminal.
+  3. Move to the directory where the cabinet file was placed.
+  4. Run fwupdmgr to schedule firmware update.
+
+        # fwupdmgr install xxx.cab
+
+  5. Restart the system.
+     You may be able to use "reboot" command.
+     If it is not available, select "Reboot" from Power icon on the desktop.
+  6. The computer will be restarted and the EFI BIOS will be updated.
+
+
+Manual Update Using fwupdate
+
+  Superuser privilege is required during the instruction.
+
+  1. Make sure the AC adapter is firmly connected to the target computer.
+  2. Launch Files application on GNOME desktop.
+  3. Locate the directory where the cabinet file was placed.
+  4. Right-click the cabinet file, select Extract Here.
+  5. Launch Terminal.
+  6. Move to the directory where the contents of the cabinet file was extracted.
+  7. Check GUID of System Firmware
+
+        # su
+        # fwupdate -l
+
+     "fwupdate -l" lists GUIDs as follows.
+     Check a GUID which is marked as System Firmware type.
+
+        System Firmware Type, {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx} version XXX can be updated to any version above XXX
+        Device Firmware Type, {yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy} version YYY can be updated to any version above YYY
+        Device Firmware Type, {zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz} version ZZZ can be updated to any version above ZZZ
+
+  8. Run fwupdate with the GUID obtained in the Step.7.
+     If fwupdate succeeds to schedule firmware update, it finishes silently without any message.
+
+        # su
+        # fwupdate -a xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx firmware.bin
+
+  9. Restart the system.
+     You may be able to use "reboot" command.
+     If it is not available, select "Reboot" from Power icon on the desktop.
+ 10. The computer will be restarted and the EFI BIOS will be updated.
+ 11. Finally delete the files extracted in the Step.4.
+
+
+--------------------------------------------------------------------------------
+INITIALIZING UEFI BIOS
+
+  UEFI BIOS Initialization is suggested for some problems. To initialize the
+  UEFI BIOS settings:
+
+  1. Turn on the computer.
+  2. While the "To interrupt normal startup, press Enter" message is displayed
+     at the lower-left area or lower-center area of the screen, press the F1 key.
+     The ThinkPad Setup menu will be displayed. If a password prompt appears,
+     type the correct password.
+  3. Press the F9 key to load default configuration.
+  4. Select Yes.
+  5. Press the F10 key to save default configuration and exit.
+  6. Select Yes.
+  7. Restart the computer.
+
+  Note:
+  After initialization you may need to reapply some settings that you had
+  changed previously.
+
+
+--------------------------------------------------------------------------------
+VERSION INFORMATION
+
+  The following versions of UEFI BIOS has been released to date.
+
+  Package      (ID)     UEFI BIOS (BIOS ID)  ECP (ECP ID)      Rev.  Issue Date
+  --------------------  -------------------  ---------------   ----  ----------
+  1.57      (N1MUL42W)  1.57 (N1MET72W)      1.22 (N1MHT33W)   01    2022/12/16
+  1.56      (N1MUL41W)  1.56 (N1MET71W)      1.22 (N1MHT33W)   01    2022/10/03
+  1.55      (N1MUL40W)  1.55 (N1MET70W)      1.22 (N1MHT33W)   01    2022/07/28
+  1.54      (N1MUL39W)  1.54 (N1MET69W)      1.22 (N1MHT33W)   01    2022/05/31
+  1.53      (N1MUL38W)  1.53 (N1MET68W)      1.22 (N1MHT33W)   01    2021/12/02
+  1.52      (N1MUL37W)  1.52 (N1MET67W)      1.22 (N1MHT33W)   01    2021/10/25
+  1.51      (N1MUL36W)  1.51 (N1MET66W)      1.22 (N1MHT33W)   01    2021/08/23
+  1.50      (N1MUL34W)  1.50 (N1MET65W)      1.20 (N1MHT31W)   01    2021/04/28
+  1.49      (N1MUL33W)  1.49 (N1MET64W)      1.20 (N1MHT31W)   01    2020/11/02
+  1.48      (N1MUL32W)  1.48 (N1MET63W)      1.20 (N1MHT31W)   01    2020/06/22
+  1.46      (N1MUL31W)  1.46 (N1MET61W)      1.20 (N1MHT31W)   01    2020/05/11
+  1.45      (N1MUL28W)  1.45 (N1MET60W)      1.20 (N1MHT31W)   01    2020/03/02
+  1.44      (N1MUL27W)  1.44 (N1MET59W)      1.20 (N1MHT31W)   01    2019/12/11
+  1.43      (N1MUL26W)  1.43 (N1MET58W)      1.20 (N1MHT31W)   01    2019/11/14
+  1.42      (N1MUL25W)  1.42 (N1MET57W)      1.19 (N1MHT30W)   01    2019/09/17
+  1.41      (N1MUL24W)  1.41 (N1MET56W)      1.19 (N1MHT30W)   01    2019/09/02
+  1.40      (N1MUL23W)  1.40 (N1MET55W)      1.19 (N1MHT30W)   01    2019/07/12
+                        1.39 (N1MET54W)      1.19 (N1MHT30W)   01    2019/04/26
+                        1.37 (N1MET52W)      1.19 (N1MHT30W)   01    2019/03/01
+                        1.36 (N1MET51W)      1.19 (N1MHT30W)   01    2019/01/25
+                        1.35 (N1MET50W)      1.19 (N1MHT30W)   01    2018/09/28
+                        1.34 (N1MET49W)      1.19 (N1MHT30W)   01    2018/07/12
+                        1.33 (N1MET48W)      1.19 (N1MHT30W)   01    2018/06/12
+                        1.31 (N1MET46W)      1.19 (N1MHT30W)   01    2018/03/15
+                        1.30 (N1MET45W)      1.18 (N1MHT29W)   01    2018/02/23
+                        1.29 (N1MET44W)      1.18 (N1MHT29W)   01    2018/02/14
+                        1.28 (N1MET43W)      1.18 (N1MHT29W)   01    2018/01/19
+                        1.27 (N1MET42W)      1.18 (N1MHT29W)   01    2017/12/21
+                        1.26 (N1MET41W)      1.17 (N1MHT28W)   01    2017/11/15
+                        1.24 (N1MET39W)      1.17 (N1MHT28W)   01    2017/10/05
+                        1.23 (N1MET38W)      1.16 (N1MHT27W)   01    2017/09/06
+                        1.22 (N1MET37W)      1.15 (N1MHT26W)   01    2017/07/05
+                        1.20 (N1MET35W)      1.14 (N1MHT25W)   01    2017/05/26
+                        1.18 (N1MET33W)      1.12 (N1MHT23W)   01    2017/04/14
+                        1.16 (N1MET31W)      1.11 (N1MHT22W)   01    2017/03/16
+                        1.15 (N1MET30W)      1.10 (N1MHT21W)   01    2017/02/28
+                        1.14 (N1MET29W)      1.08 (N1MHT19W)   01    2017/02/15
+                        1.06 (N1MET21W)      1.04 (N1MHT15W)   01    2017/01/12
+
+
+  To check the version of UEFI BIOS, refer to the Determining which version is
+  installed section.
+
+
+Summary of Changes
+
+  Where: <   >        Package version
+         UEFI:        UEFI BIOS version
+         ECP:         Embedded Controller Program version
+         [Important]  Important update
+         (New)        New function or enhancement
+         (Fix)        Correction to existing function
+
+<1.57>
+ UEFI: 1.57 / ECP: 1.22
+- [Important] Enhancement to address security vulnerability, CVE-2017-5715
+- [Important] Enhancement to address security vulnerability, CVE-2022-33894
+- [Important] Enhancement to address security vulnerability, CVE-2022-34301, CVE-2022-34302, CVE-2022-34303
+- (New) Updated the Diagnostics module to version 04.27.000.
+
+<1.56>
+ UEFI: 1.56 / ECP: 1.22
+- [Important] Update includes a security fix.
+- (New) Updated the Diagnostics module to version 04.26.000.
+
+<1.55>
+ UEFI: 1.55 / ECP: 1.22
+- [Important] Update includes a security fix.
+- (New) Updated the Diagnostics module to version 04.25.000.
+
+<1.54>
+ UEFI: 1.54 / ECP: 1.22
+- [Important] Enhancement to address security vulnerability, CVE-2022-21151, CVE-2022-0005.
+- (New) Updated the Diagnostics module to version 04.24.000.
+- (New) Updated the CPU microcode.
+- (New) Update MEBx.
+
+<1.53>
+ UEFI: 1.53 / ECP: 1.22
+- [Important] Update includes a security fix.
+- (New) Updated the CPU microcode.
+- (Fix) Fixed an issue where device firmware update via Windows Update failed
+        when OPAL management software is installed.
+
+<1.52>
+ UEFI: 1.52 / ECP: 1.22
+- [Important] Update includes a security fix.
+- (New) Updated the Diagnostics module to version 04.18.000.
+
+<1.51>
+ UEFI: 1.51 / ECP: 1.22
+- [Important] Update includes a security fix.
+
+<1.50>
+ UEFI: 1.50 / ECP: 1.20
+- [Important] CVE-2020-24511 , CVE-2020-24512.
+              (https://cve.mitre.org/cgi-bin/cvename.cgi?name=2020-24511)
+	      (https://cve.mitre.org/cgi-bin/cvename.cgi?name=2020-24512)
+- (New) Updated the CPU microcode.
+- (New) Updated the Diagnostics module to version 04.17.000.
+
+<1.49>
+ UEFI: 1.49 / ECP: 1.20
+- [Important] Update includes a security fix.
+- [Important] Addresses CVE-2020-8696 and CVE-2020-8698.
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8696)
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8698)
+- [Important] Addresses CVE-2020-0587, CVE-2020-0588, CVE-2020-0590, CVE-2020-0591,
+             CVE-2020-0592, and CVE-2020-0593.
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0587)
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0588)
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0590)
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0591)
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0592)
+             (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0593)
+- (New) Updated the CPU microcode.
+- (New) Updated the Diagnostics module to version 04.15.000.
+
+<1.48>
+ UEFI: 1.48 / ECP: 1.20
+- [Important] Address CVE-2020-0548,
+              (https://cve.mitre.org//cgi-bin//cvename.cgi?name=CVE-2020-0548)
+- [Important] Address CVE-2020-0549,
+              (https://cve.mitre.org//cgi-bin//cvename.cgi?name=CVE-2020-0549)
+- [Important] Address CVE-2020-0543,
+              (https://cve.mitre.org//cgi-bin//cvename.cgi?name=CVE-2020-0543)
+
+<1.46>
+ UEFI: 1.46 / ECP: 1.20
+- [Important] Update includes a security fix.
+- (New)Updated the Diagnostics module to version 04.12.001.
+- (Fix) Fixed an issue where Force PXE boot by Intel AMT does not work.
+
+<1.45>
+ UEFI: 1.45 / ECP: 1.20
+- [Important] Update includes a security fix.
+
+<1.44>
+ UEFI: 1.44 / ECP: 1.20
+- [Important] Addresses CVE-2019-0185
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0185)
+   Refer to Lenovo's Security Advisory page for additional information about
+   LEN-27714 "Multi-vendor BIOS Security Vulnerabilities"
+  (https://support.lenovo.com/us/en/product_security/LEN-27714)
+- [Important] Addresses CVE-2019-14607
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019- 14607)
+- [Important] Security fix addresses LEN-29406 ST Microelectronics TPM Firmware ECDSA
+  Signature Generation Vulnerability.
+  Refer to Lenovo's Security Advisory page for additional information.
+  (https://support.lenovo.com/us/en/solutions/LEN-29406)
+- (New)Supported BIOS password authentication before entering into MEBx.
+
+<1.43>
+ UEFI: 1.43 / ECP: 1.20
+- [Important]Update includes a security fix.
+- [Important]Addresses CVE-2019-0151
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0151)
+- [Important]Addresses CVE-2019-0152
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0152)
+- [Important]Addresses CVE-2019-0123
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0123)
+- [Important]Addresses CVE-2019-0124
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0124)
+- [Important]Addresses CVE-2019-0117
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0117)
+- [Important]Addresses CVE-2019-0184
+  (https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-0184)
+   Refer to Lenovo's Security Advisory page for additional information about
+   LEN-27714 "Multi-vendor BIOS Security Vulnerabilities"
+  (https://support.lenovo.com/us/en/product_security/LEN-27714)
+- (Fix) Fixed an issue where monitors attached to ThinkPad Docking Stations are
+   disconnected when battery charging is reached to 100%.
+
+<1.42>
+ UEFI: 1.42 / ECP: 1.19
+- (New) Support TPM firmware update.
+
+<1.41>
+ UEFI: 1.41 / ECP: 1.19
+- [Important] Update includes a security fix.
+
+<1.40>
+ UEFI: 1.40 / ECP: 1.19
+- [Important] Update includes a security fix.
+- (Fix) Fixed an issue where system might hang up at POST when some KVM device was connected.
+- (Fix) Fixed an issue where system might hang up after tried network boot from Hybrid Dock
+        in Legacy Boot Mode when the USB UEFI BIOS Support set as Disabled.
+
+<1.39>
+ UEFI: 1.39 / ECP: 1.19
+- [Important] Enhancement to address security vulnerability CVE-2018-12126,
+ (https://cve.mitre.org//cgi-bin//cvename.cgi?name=CVE-2018-12126)
+- [Important] Enhancement to address security vulnerability CVE-2018-12127,
+ (https://cve.mitre.org//cgi-bin//cvename.cgi?name=CVE-2018-12127)
+- [Important] Enhancement to address security vulnerability CVE-2018-12130,
+ (https://cve.mitre.org//cgi-bin//cvename.cgi?name=CVE-2018-12130)
+- [Important] Refer to Lenovo's Security Advisory page for additional information about
+  LEN-26696 "Microarchitectural Data Sampling (MDS) Side Channel Vulnerabilities"
+ (https://support.lenovo.com/us/en/product_security/LEN-26696).
+- (New) Updated the CPU microcode.
+- (New) Updated the Diagnostics module to version 04.08.000.
+- (Fix) Fixed an issue where the system may not detect Thunderbolt device after attach
+  dock during S3.
+- (Fix) Fixed an issue where system might automatically wake up right after shutdown.
+- (Fix) Fixed an issue where Thunderbolt 3 Dock Gen2/Thunderbolt 3 Workstation Dock
+  LAN device might not be recognized as boot device when system in legacy boot mode.
+
+<1.37>
+ UEFI: 1.37 / ECP: 1.19
+- [Important] Update includes a security fix.
+
+<1.36>
+ UEFI: 1.36 / ECP: 1.19
+- [Important] Security fix addresses LEN-25085 Intel Firmware Vulnerabilities. Refer
+              to Lenovo's Security Advisory page for additional information.
+              (https://support.lenovo.com/us/en/solutions/LEN-25085)
+- (New) Updated the CPU microcode.
+- (New) BootOrderLock was shown as Enable in WMI command if Device Guard was enabled.
+- (New) Updated the Diagnostics module to version 04.06.000.
+
+<1.35>
+ UEFI: 1.35 / ECP: 1.19
+-[Important] Update includes a security fix.
+-[Important] Added Hyper Threading enable/disable option to ThinkPad Setup for virtualized
+             system users in order to address LEN-24163 L1 Terminal Fault Side Channel
+             Vulnerabilities (CVE-2018-3646) Refer to LenovoÅfs Security Advisory page for
+             additional information.(https://support.lenovo.com/us/en/solutions/LEN-24163)
+- (Fix) Fixed an issue where the system may not unlock by TPM pin code.
+
+<1.34>
+ UEFI: 1.34 / ECP: 1.19
+- [Important] Update includes a security fix.
+- (New) Updated the Diagnostics module to version 04.00.001.
+- (Fix) Fixed an issue where BIOS POST might display the error message "Boot Manager
+  recover from an error."
+- (Fix) Fixed an issue where BIOS silent update might fail with system account.
+
+<1.33>
+ UEFI: 1.33 / ECP: 1.19
+-[Important] Security fix addresses LEN-22133 Speculative Execution Side Channel Variants 4
+             and 3a (CVE-2018-3639, CVE-2018-3640). Refer to LenovoÅfs Security Advisory page
+             for additional information. (https://support.lenovo.com/product_security/home)
+- (Fix) Fixed an issue where Ethernet is unstable when network boot was tried before Windows boot
+        in Legacy boot mode.
+- (Fix) Fixed an issue where Wireless LAN device is disabled at boot when "Disable new DMA devices
+        when this computer is locked" is enabled at Group Policy on Windows 10 Version 1703.
+
+<1.31>
+ UEFI: 1.31 / ECP: 1.19
+- [Important] Security fix addresses LEN-19568 Intel Active Management Technology MEBx Access Control Bypass.
+- (New) Supported Pre-Boot ACL option for Thunderbolt device on pre-boot environment
+        in ThinkPad Setup - Config - Thunderbolt 3.
+        (Note)
+         To use this feature, System need to update
+         Thunderbolt software to version 17.3.73.350 or higher and
+         Thunderbolt firmware to NVM 26 or higher.
+- (New) Updated the Diagnostics module to version 03.12.003.
+- (Fix) Fixed an issue where system may hang when Thunderbolt dock is unplugged in ThinkPad Setup.
+
+<1.30>
+ UEFI: 1.30 / ECP: 1.18
+- [Important] Enhancement to address CVE-2017-5715.
+
+<1.29>
+ UEFI: 1.29 / ECP: 1.18
+- (New) Updated the CPU microcode.
+- (Fix) Fixed a mismatch issue between the Intel(R) ME configuration and FPF fuse settings.
+
+<1.28>
+ UEFI: 1.28 / ECP: 1.18
+- (New) Updated the CPU microcode.
+- (New) Updated the Diagnostics module to version 03.12.002.
+- (New) Support switching TPM1.2 and 2.0 by utility.
+- (Fix) Fixed an issue where Bitlocker Network Unlock doesn't work under multi-subnet environment.
+
+<1.27>
+ UEFI: 1.27 / ECP: 1.18
+- (New) Updated the CPU microcode.
+- (Fix) Fix an issue where user cannot enter Bitlocker Pin code by using Bloomberg 4 keyboard.
+- (Fix) Fix an issue where system cannot boot with USB 3.0 Ethernet adapter or ThinkPad Docks
+        with USB Ethernet device.
+- (Fix) Fix an issue where Operating System cannot recognize custom ACPI Table.
+
+<1.26>
+ UEFI: 1.26 / ECP: 1.17
+- (Fix) Fixed an issue where fan might rotated with max speed due to not reading CPU
+        temperature correctly.
+- (Fix) Fixed an issue where PCI LAN might disappeared on boot menu after SCCM OS deployment.
+- (Fix) Fixed an issue where system might not boot to OS when attached an external monitor
+        and its USB3 devices.
+- (Fix) Fixed an issue where network boot might happened at reboot after resume from suspend
+         by Wake On LAN.
+
+<1.24>
+ UEFI: 1.24 / ECP: 1.17
+- (New) Support interface of TPM firmware update.
+- (New) Updated the Diagnostics module to version 03.11.001.
+- (New) Updated the CPU microcode.
+- (New) Updated Realtek UNDI driver and option rom.
+- (Fix) Improved timing to display POP up message when a supported PD device or AC adapter
+        is attached.
+
+<1.23>
+ UEFI: 1.23 / ECP: 1.16
+- [Important] Update includes a security fix.
+              (Note)
+              If the UEFI BIOS has been updated to version 1.23 or higher, it is no longer
+              able to roll back to the version before 1.23 for security improvement.
+- (New) Updated the readme file.
+- (New) Supported error message for WUFU power check failure.
+- (New) Updated the Diagnostics module to version 03.11.000.
+- (New) Enhanced Bottom Cover Tamper detection.
+- (Fix) Fixed an issue where 16bit application cannot run on Windows 7 32 bit command prompt.
+- (Fix) Fixed an issue where ethernet is unstable when network boot was tried before Windows boot.
+- (Fix) Fixed BitLocker recovery issue when PCR5 was enabled as platform validation profile.
+- (Fix) Fixed an issue where Windows 10 installation might be failed when Boot Order Lock is enabled.
+
+<1.22>
+ UEFI: 1.22 / ECP: 1.15
+- (New) Updated the CPU microcode.
+- (Fix) Fixed an issue where bottom cover tamper might not be detected without AC adapter.
+- (Fix) Fixed an issue where no boot device might be shown when Boot Order Lock is
+        enabled after Microsoft SCCM installation.
+- (Fix) Improved Trackpoint firmware update process.
+- (Fix) Fixed the problem of Remote Secure Erase.
+- (Fix) Fixed an issue where WQHD LCD panel might have flicker.
+
+<1.20>
+ UEFI: 1.20 / ECP: 1.14
+- [Important] Update includes a security fix.
+- (New) Updated the CPU microcode.
+- (New) Updated the Diagnostics module to version 03.10.001.
+- (New) Support interface of Trackpoint firmware update.
+
+<1.18>
+ UEFI: 1.18 / ECP: 1.12
+- (New) Updated the Diagnostics module to version 03.10.00.
+- (New) Improved Fan Control
+- (Fix) Fixed an issue where system might not detect USB-C AC adapter.
+- (Fix) Fixed an issue where network boot might fail in multi subnet environment
+        when network device is set as top boot priority order in BIOS Setup.
+
+<1.16>
+ UEFI: 1.16 / ECP: 1.11
+- (New) Added support of Windows 8.1 64-bit.
+- (New) Updated the CPU microcode.
+- (Fix) Fixed some issues with ThinkPad Thunderbolt 3 Dock or ThinkPad USB-C Dock.
+- (Fix) Fixed an issue where Windows 7 32 bit system might hang at resume from hibernation.
+
+<1.15>
+ UEFI: 1.15 / ECP: 1.10
+- (New) Added support for ThinkPad X1 Carbon (Type 20K3, 20K4).
+- (New) Added support of Windows 7.
+- (Fix) Fixed an issue to improve POST time.
+- (Fix) Fixed an issue where system may become hot during battery charge.
+- (Fix) Added improvement of Fan noise.
+
+<1.14>
+ UEFI: 1.14 / ECP: 1.08
+- [Important] Security fix addresses LEN-13640 Intel Direct Connect Interface Can Be Enabled
+              (Note)
+              If the UEFI BIOS has been updated to version 1.14 or higher,
+              it is no longer able to roll back to the version before 1.14
+              for security improvement.
+- (New) Updated the CPU microcode.
+- (New) Updated the Diagnostics module to version 03.08.00.
+- (New) Updated to display the device name of PCI LAN on ThinkPad Setup in place
+        of MAC address.
+- (New) Added interface for Thunderbolt 3 Firmware update.
+- (Fix) Fixed an issue where CPU temperature may not be read correctly.
+- (Fix) Fixed Thunderbolt 3 issues.
+- (Fix) Added the condition of Total Graphics memory increase to prevent PCI
+        resource error.
+- (Fix) Fixed an issue where noise may sound with the wake from sleep state
+        during listening music.
+
+<1.06>
+ UEFI: 1.06 / ECP: 1.04
+- (New) Initial release for ThinkPad X1 Carbon (Type 20HQ, 20HR).
+
+--------------------------------------------------------------------------------
+LIMITATIONS
+
+  Nothing.
+
+
+--------------------------------------------------------------------------------
+TRADEMARKS
+
+* Lenovo, ThinkPad and ThinkVantage are registered trademarks of Lenovo.
+
+* Intel is a registered trademark of Intel Corporation.
+
+Other company, product, and service names may be registered trademarks,
+trademarks or service marks of others.
